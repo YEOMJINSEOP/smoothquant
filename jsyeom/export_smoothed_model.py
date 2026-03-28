@@ -1,10 +1,12 @@
 import torch
 import torch.nn as nn
 import argparse
+import json
 import os
+import shutil
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, HfApi
 from datasets import load_dataset
 from smoothquant.smooth import smooth_lm
 import tqdm
@@ -120,11 +122,76 @@ def main():
     model.save_pretrained(args.output_dir)
     tokenizer.save_pretrained(args.output_dir)
 
-    # 7) Optionally push to HuggingFace Hub
+    # 7) Save smoothing metadata
+    smoothquant_meta = {
+        "base_model": args.model_name,
+        "smoothing_alpha": args.alpha,
+        "act_scales_source": "mit-han-lab/smoothquant-scales",
+        "act_scales_file": os.path.basename(args.act_scales_path),
+        "quantization_applied": False,
+        "warning": "Do NOT apply smooth_lm() again. Smoothing is already applied.",
+    }
+    with open(os.path.join(args.output_dir, "smoothquant_config.json"), "w") as f:
+        json.dump(smoothquant_meta, f, indent=2)
+
+    # 8) Bundle act_scales alongside the model
+    scales_dst = os.path.join(args.output_dir, os.path.basename(args.act_scales_path))
+    if not os.path.exists(scales_dst):
+        shutil.copy2(args.act_scales_path, scales_dst)
+        print(f"Bundled activation scales: {scales_dst}")
+
+    # 9) Generate Model Card (README.md)
+    model_card = f"""---
+language: en
+tags:
+  - smoothquant
+  - llama2
+base_model: {args.model_name}
+---
+
+# {os.path.basename(args.output_dir)}
+
+This model has SmoothQuant smoothing applied. No quantization has been applied.
+
+## Smoothing Configuration
+
+| Parameter         | Value                           |
+|-------------------|---------------------------------|
+| Base model        | `{args.model_name}`             |
+| Alpha             | `{args.alpha}`                  |
+| Act scales source | `mit-han-lab/smoothquant-scales`|
+| Quantization      | None (smoothing only)           |
+
+## Usage
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model = AutoModelForCausalLM.from_pretrained("{args.push_to_hub or args.output_dir}")
+tokenizer = AutoTokenizer.from_pretrained("{args.push_to_hub or args.output_dir}")
+```
+
+## Important Notes
+
+- **Do NOT** call `smooth_lm()` again on this model. Smoothing is already applied.
+- To apply quantization, simply call `quantize_model(model)`.
+- To re-experiment with a different alpha, use the bundled `{os.path.basename(args.act_scales_path)}` on the original base model.
+"""
+    with open(os.path.join(args.output_dir, "README.md"), "w") as f:
+        f.write(model_card)
+
+    print("Saved: smoothquant_config.json, act_scales, README.md")
+
+    # 10) Optionally push to HuggingFace Hub
     if args.push_to_hub:
         print(f"Pushing to HuggingFace Hub: {args.push_to_hub}")
-        model.push_to_hub(args.push_to_hub)
-        tokenizer.push_to_hub(args.push_to_hub)
+        api = HfApi()
+        api.upload_folder(
+            folder_path=args.output_dir,
+            repo_id=args.push_to_hub,
+            repo_type="model",
+            create_pr=False,
+        )
         print(f"Upload complete: https://huggingface.co/{args.push_to_hub}")
 
     print("Done.")
