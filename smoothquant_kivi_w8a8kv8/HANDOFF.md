@@ -33,13 +33,14 @@ git clone https://$GH_TOKEN@github.com/YEOMJINSEOP/KIVI.git          # YOUR fork
 git clone https://github.com/mit-han-lab/llm-awq.git                  # upstream; our jsyeom/ comes from NAS
 ```
 
-## 2. Small inputs (staged on NAS by origin server)
-`/NAS/jsyeom/regen_inputs/` should contain:
+## 2. Small inputs (shipped INSIDE the smoothquant repo — no NAS needed)
+`smoothquant/regen_inputs/` (cloned in step 1) already contains:
 - `llama-3.1-8b-instruct.pt` (act_scales, 5MB)
-- `llama-3.1-8b-instruct-w4-g128.pt` (official AWQ search, 100MB) — **reused, not regenerated**
-- `awq_jsyeom/` (our AWQ scripts → becomes `llm-awq/jsyeom/`)
+- `llama-3.1-8b-instruct-w4-g128.pt` (official AWQ search, 95MiB) — **reused, not regenerated**
+- `awq_jsyeom/` (our AWQ scripts → script copies these into `llm-awq/jsyeom/`)
 
-Also need the **lm_eval fork** (RULER tasks) at `$LMEVAL_DIR` (git or NAS).
+The script reads them via `INPUTS=$SQ/regen_inputs` (default). Only external dep to fetch
+separately is the **lm_eval fork** (RULER tasks) at `$LMEVAL_DIR` (git clone).
 
 ## 3. Environment (version pins = reproducibility)
 ```bash
