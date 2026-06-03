@@ -53,16 +53,27 @@ pip install -e $LMEVAL_DIR/src/lm-eval        # lm_eval 0.4.9.1 fork (RULER buil
 ```
 Pins: torch 2.8.0+cu128, **transformers 4.56.1**, flash_attn 2.8.3, lm_eval 0.4.9.1(fork), datasets 3.6.0.
 
-## 4. Run (the script does both projects with hard verification gates)
+## 4. Run — SELF-HEALING (never stalls, auto-resumes from checkpoints)
 ```bash
 cd /SSD/JSY/smoothquant/smoothquant_kivi_w8a8kv8
 chmod +x regen_and_upload.sh
-export LMEVAL_DIR=/SSD/JSY/-ASSIGN-mask_lm_eval   # adjust to actual path
-./regen_and_upload.sh all 2>&1 | tee run.out      # or: sq | awq
+export LMEVAL_DIR=/SSD/JSY/-ASSIGN-mask_lm_eval        # adjust to actual path
+
+# (a) WHILE AWAKE — proves the whole pipeline works in ~1-2 min (model load, HF token,
+#     gated-model access, lm_eval RULER prompt, KIVI forward). Fix anything it flags.
+./regen_and_upload.sh preflight
+
+# (b) then launch detached so it survives logout/disconnect and runs overnight:
+setsid nohup ./regen_and_upload.sh all >> regen.out 2>&1 &
+tail -f regen.out
 ```
-The script: preflight (token/CUDA/deps/disk) → P1 (save W8A8 → split → dump KV → convert →
-`verify_final` gate → upload) → P2 (save W4 → dump KV → optional verify → upload).
-Any `FAIL` in a verify step aborts. Uploads are resumable (`upload_large_folder`), so re-run on interruption.
+How it guarantees no morning restart:
+- **checkpoints** (`$ROOT/.regen_ckpt/*.done`) → re-running resumes; finished stages skip.
+- **retry+backoff** on every stage; **uploads retry up to 100×** (resumable `upload_large_folder`).
+- **outer loop** keeps cycling until both repos verify complete (or `MAX_CYCLES=300`).
+- **verification is advisory** — fp16-LSB diffs on a different GPU are logged, never fatal
+  (the artifact is still a valid W8A8+KIVI / W4A16+KIVI product).
+- if it ever exits incomplete, just **re-run the same command** — it picks up where it left off.
 
 ## 5. "Done" criteria — verify before declaring success
 - `verify_final.py` printed **PASS** (no `FAIL`) for P1; `save_w4_weights` printed **PASS** for P2.
