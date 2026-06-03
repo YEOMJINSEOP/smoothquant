@@ -1,0 +1,59 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "combined": "SmoothQuant W8A8 (per-channel w / per-token a INT8, alpha=0.85, bmm_input=False) + KIVI-INT8 KV (k per-channel/v per-token, group_size=32, residual_length=128, k=v=8bit, fake-quant)",
+  "eval": {
+    "ruler": "@32K limit100 batch1",
+    "gsm8k_cot": "full batch8",
+    "longbench_hotpotqa": "full(200) batch1 do_sample=True"
+  },
+  "comparison": {
+    "niah_multikey_1": {
+      "original": 1.0,
+      "combined": 1.0,
+      "delta": 0.0
+    },
+    "ruler_vt": {
+      "original": 0.998,
+      "combined": 1.0,
+      "delta": 0.002
+    },
+    "ruler_cwe": {
+      "original": 0.03,
+      "combined": 0.132,
+      "delta": 0.102
+    },
+    "ruler_fwe": {
+      "original": 0.94,
+      "combined": 0.9267,
+      "delta": -0.0133
+    },
+    "ruler_qa_squad": {
+      "original": 0.7342,
+      "combined": 0.735,
+      "delta": 0.0008
+    },
+    "gsm8k_cot_flexible": {
+      "original": 0.768,
+      "combined": 0.7536,
+      "delta": -0.0144
+    },
+    "gsm8k_cot_strict": {
+      "original": 0.7544,
+      "combined": 0.74,
+      "delta": -0.0144
+    },
+    "longbench_hotpotqa_f1": {
+      "original": 0.2399,
+      "combined": 0.2048,
+      "delta": -0.0351
+    }
+  },
+  "elapsed_min": {
+    "combined_ruler": 132.9,
+    "original_hotpot": 8.2,
+    "original_gsm8k": 16.6,
+    "combined_gsm8k": 23.7,
+    "original_ruler": 67.7,
+    "combined_hotpot": 12.4
+  }
+}

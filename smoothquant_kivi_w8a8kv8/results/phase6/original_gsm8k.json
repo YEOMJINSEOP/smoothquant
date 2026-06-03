@@ -1,0 +1,29 @@
+{
+  "variant": "original",
+  "group": "gsm8k",
+  "tasks": [
+    "gsm8k_cot"
+  ],
+  "limit": null,
+  "batch_size": 8,
+  "max_length": 4096,
+  "ruler_seqlen": null,
+  "config": {
+    "alpha": 0.85,
+    "group_size": 32,
+    "residual_length": 128,
+    "k_bits": 8,
+    "v_bits": 8,
+    "quantize_bmm_input": false
+  },
+  "elapsed_sec": 997.1176717281342,
+  "results": {
+    "gsm8k_cot": {
+      "alias": "gsm8k_cot",
+      "exact_match,strict-match": 0.7543593631539045,
+      "exact_match_stderr,strict-match": "N/A",
+      "exact_match,flexible-extract": 0.7680060652009097,
+      "exact_match_stderr,flexible-extract": "N/A"
+    }
+  }
+}

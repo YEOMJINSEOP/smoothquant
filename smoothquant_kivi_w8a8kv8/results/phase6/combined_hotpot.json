@@ -1,0 +1,27 @@
+{
+  "variant": "combined",
+  "group": "hotpot",
+  "tasks": [
+    "longbench_hotpotqa"
+  ],
+  "limit": null,
+  "batch_size": 1,
+  "max_length": 17000,
+  "ruler_seqlen": null,
+  "config": {
+    "alpha": 0.85,
+    "group_size": 32,
+    "residual_length": 128,
+    "k_bits": 8,
+    "v_bits": 8,
+    "quantize_bmm_input": false
+  },
+  "elapsed_sec": 742.1810915470123,
+  "results": {
+    "longbench_hotpotqa": {
+      "alias": "longbench_hotpotqa",
+      "qa_f1_score,none": 0.20480049854201318,
+      "qa_f1_score_stderr,none": "N/A"
+    }
+  }
+}
