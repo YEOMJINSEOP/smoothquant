@@ -71,6 +71,13 @@ sys.path[:0]=["$CODE"]
 import torch, transformers, flash_attn, safetensors, huggingface_hub
 assert torch.cuda.is_available(), "CUDA unavailable"
 assert hasattr(torch, "float8_e4m3fn"), "torch has no float8_e4m3fn"
+# safetensors must be new enough to write/read fp8 (else save would fail all night)
+import tempfile
+from safetensors.torch import save_file as _sf, load_file as _lf
+_p=os.path.join(tempfile.gettempdir(),"_fp8_pre.safetensors")
+_sf({"x": torch.zeros(4,4).to(torch.float8_e4m3fn).contiguous()}, _p)
+assert _lf(_p)["x"].dtype==torch.float8_e4m3fn, "safetensors can't roundtrip fp8 — upgrade safetensors>=0.4.3"
+os.remove(_p); print("safetensors fp8 roundtrip OK (v%s)" % safetensors.__version__)
 from huggingface_hub import HfApi
 api=HfApi(token=os.environ["HF_TOKEN"]); print("HF user:", api.whoami()["name"])
 api.model_info("meta-llama/Llama-3.1-8B-Instruct"); print("gated model OK")
