@@ -16,6 +16,10 @@ Run one (variant, group) per process so they can be parallelized across GPUs, e.
   CUDA_VISIBLE_DEVICES=1 python eval_lmeval.py --variant combined --group ruler
 """
 import os, sys, json, argparse, time
+# Full determinism: PYTHONHASHSEED must be set before interpreter start, so re-exec once.
+if os.environ.get("PYTHONHASHSEED") != "0":
+    os.environ["PYTHONHASHSEED"] = "0"
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 sys.path.insert(0, "/SSD/JSY/smoothquant")
 sys.path.insert(0, "/SSD/JSY/KIVI")
 import torch
@@ -70,6 +74,7 @@ def main():
     ap.add_argument("--residual-length", type=int, default=128)
     ap.add_argument("--k-bits", type=int, default=8)
     ap.add_argument("--v-bits", type=int, default=8)
+    ap.add_argument("--seed", type=int, default=0, help="locks all RNGs (random/numpy/torch/fewshot) for reproducible RULER prompts")
     ap.add_argument("--out", default="results/phase6")
     args = ap.parse_args()
 
@@ -93,15 +98,18 @@ def main():
     meta = {"max_seq_lengths": [32768], "tokenizer": MODEL, "pretrained": MODEL} if is_ruler else {}
     tm = TaskManager(metadata=meta) if meta else TaskManager()
 
-    print(f"[{args.variant}/{args.group}] eval tasks={tasks} limit={limit} bs={batch_size} maxlen={max_length}", flush=True)
+    print(f"[{args.variant}/{args.group}] eval tasks={tasks} limit={limit} bs={batch_size} maxlen={max_length} seed={args.seed}", flush=True)
     t0 = time.time()
     res = evaluator.simple_evaluate(model=lm, tasks=tasks, limit=limit, batch_size=batch_size,
-                                    task_manager=tm, bootstrap_iters=0)
+                                    task_manager=tm, bootstrap_iters=0,
+                                    random_seed=args.seed, numpy_random_seed=args.seed,
+                                    torch_random_seed=args.seed, fewshot_random_seed=args.seed)
     dt = time.time() - t0
 
     os.makedirs(args.out, exist_ok=True)
     save = {"variant": args.variant, "group": args.group, "tasks": tasks, "limit": limit,
             "batch_size": batch_size, "max_length": max_length, "ruler_seqlen": 32768 if is_ruler else None,
+            "seed": args.seed,
             "config": {"alpha": args.alpha, "group_size": args.group_size,
                        "residual_length": args.residual_length, "k_bits": args.k_bits, "v_bits": args.v_bits,
                        "quantize_bmm_input": False},
