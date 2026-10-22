@@ -27,6 +27,9 @@ def main():
     ap.add_argument("--repo-type", default="dataset", choices=["dataset", "model"])
     ap.add_argument("--public", action="store_true", help="make repo public (default: private)")
     ap.add_argument("--token", default=os.environ.get("HF_TOKEN"))
+    ap.add_argument("--include", nargs="+", default=None,
+                    help="allow_patterns (glob, relative to --path). e.g. 'w8_of_*' (weights) or 'kv_*' (KV)")
+    ap.add_argument("--exclude", nargs="+", default=None, help="ignore_patterns (glob)")
     args = ap.parse_args()
 
     assert os.path.isdir(args.path), f"not a dir: {args.path}"
@@ -35,12 +38,16 @@ def main():
     create_repo(args.repo_id, repo_type=args.repo_type, private=not args.public,
                 exist_ok=True, token=args.token)
     print(f"repo ready: {args.repo_id} (type={args.repo_type}, private={not args.public})")
+    if args.include or args.exclude:
+        print(f"  include={args.include} exclude={args.exclude} (folder structure preserved)")
 
-    # resumable large-folder upload (many files + ~51GB)
+    # resumable large-folder upload (many files); patterns let you split weights vs KV
     api.upload_large_folder(
         repo_id=args.repo_id,
         repo_type=args.repo_type,
         folder_path=args.path,
+        allow_patterns=args.include,
+        ignore_patterns=args.exclude,
     )
     print(f"upload complete → https://huggingface.co/{args.repo_type}s/{args.repo_id}")
 
