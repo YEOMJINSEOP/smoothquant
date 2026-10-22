@@ -1,0 +1,28 @@
+{
+  "variant": "combined",
+  "group": "hotpot",
+  "tasks": [
+    "longbench_hotpotqa"
+  ],
+  "limit": null,
+  "batch_size": 1,
+  "max_length": 17000,
+  "ruler_seqlen": null,
+  "weight_method": "AWQ asym W4 g128 (W4A16)",
+  "awq_search": "llama-3.1-8b-instruct-w4-g128.pt",
+  "seed": 0,
+  "config": {
+    "group_size": 32,
+    "residual_length": 128,
+    "k_bits": 8,
+    "v_bits": 8
+  },
+  "elapsed_sec": 662.323050737381,
+  "results": {
+    "longbench_hotpotqa": {
+      "alias": "longbench_hotpotqa",
+      "qa_f1_score,none": 0.19718058629730165,
+      "qa_f1_score_stderr,none": "N/A"
+    }
+  }
+}

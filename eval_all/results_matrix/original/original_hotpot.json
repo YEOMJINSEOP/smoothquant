@@ -1,0 +1,25 @@
+{
+  "variant": "original",
+  "group": "hotpot",
+  "tasks": [
+    "longbench_hotpotqa"
+  ],
+  "limit": null,
+  "batch_size": 1,
+  "max_length": 17000,
+  "ruler_seqlen": null,
+  "weight_method": "fp16",
+  "kv_method": "fp16",
+  "seed": 0,
+  "config": {
+    "fp8_format": "e4m3fn"
+  },
+  "elapsed_sec": 481.1630504131317,
+  "results": {
+    "longbench_hotpotqa": {
+      "alias": "longbench_hotpotqa",
+      "qa_f1_score,none": 0.2633014482723573,
+      "qa_f1_score_stderr,none": "N/A"
+    }
+  }
+}

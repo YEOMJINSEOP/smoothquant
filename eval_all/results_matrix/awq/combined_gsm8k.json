@@ -1,0 +1,30 @@
+{
+  "variant": "combined",
+  "group": "gsm8k",
+  "tasks": [
+    "gsm8k_cot"
+  ],
+  "limit": null,
+  "batch_size": 8,
+  "max_length": 4096,
+  "ruler_seqlen": null,
+  "weight_method": "AWQ asym W4 g128 (W4A16)",
+  "awq_search": "llama-3.1-8b-instruct-w4-g128.pt",
+  "seed": 0,
+  "config": {
+    "group_size": 32,
+    "residual_length": 128,
+    "k_bits": 8,
+    "v_bits": 8
+  },
+  "elapsed_sec": 1255.415335893631,
+  "results": {
+    "gsm8k_cot": {
+      "alias": "gsm8k_cot",
+      "exact_match,strict-match": 0.7369219105382866,
+      "exact_match_stderr,strict-match": "N/A",
+      "exact_match,flexible-extract": 0.7429871114480667,
+      "exact_match_stderr,flexible-extract": "N/A"
+    }
+  }
+}

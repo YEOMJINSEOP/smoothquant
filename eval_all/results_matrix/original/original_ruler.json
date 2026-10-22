@@ -1,0 +1,59 @@
+{
+  "variant": "original",
+  "group": "ruler",
+  "tasks": [
+    "niah_multikey_1",
+    "ruler_vt",
+    "ruler_cwe",
+    "ruler_fwe",
+    "ruler_qa_squad"
+  ],
+  "limit": 100,
+  "batch_size": 1,
+  "max_length": 34000,
+  "ruler_seqlen": 32768,
+  "weight_method": "fp16",
+  "kv_method": "fp16",
+  "seed": 0,
+  "config": {
+    "fp8_format": "e4m3fn"
+  },
+  "elapsed_sec": 4088.6596217155457,
+  "results": {
+    "niah_multikey_1": {
+      "alias": "niah_multikey_1",
+      "4096,none": -1,
+      "4096_stderr,none": "N/A",
+      "32768,none": 1.0,
+      "32768_stderr,none": "N/A"
+    },
+    "ruler_cwe": {
+      "alias": "ruler_cwe",
+      "4096,none": -1,
+      "4096_stderr,none": "N/A",
+      "32768,none": 0.030000000000000006,
+      "32768_stderr,none": "N/A"
+    },
+    "ruler_fwe": {
+      "alias": "ruler_fwe",
+      "4096,none": -1,
+      "4096_stderr,none": "N/A",
+      "32768,none": 0.9400000000000003,
+      "32768_stderr,none": "N/A"
+    },
+    "ruler_qa_squad": {
+      "alias": "ruler_qa_squad",
+      "4096,none": -1,
+      "4096_stderr,none": "N/A",
+      "32768,none": 0.7341666666666667,
+      "32768_stderr,none": "N/A"
+    },
+    "ruler_vt": {
+      "alias": "ruler_vt",
+      "4096,none": -1,
+      "4096_stderr,none": "N/A",
+      "32768,none": 0.998,
+      "32768_stderr,none": "N/A"
+    }
+  }
+}

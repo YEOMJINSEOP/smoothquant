@@ -1,0 +1,25 @@
+{
+  "variant": "combined",
+  "group": "hotpot",
+  "tasks": [
+    "longbench_hotpotqa"
+  ],
+  "limit": null,
+  "batch_size": 1,
+  "max_length": 17000,
+  "ruler_seqlen": null,
+  "weight_method": "per_tensor FP8 E4M3 (W-FP8, A-FP16)",
+  "kv_method": "per_tensor FP8 E4M3",
+  "seed": 0,
+  "config": {
+    "fp8_format": "e4m3fn"
+  },
+  "elapsed_sec": 627.745924949646,
+  "results": {
+    "longbench_hotpotqa": {
+      "alias": "longbench_hotpotqa",
+      "qa_f1_score,none": 0.22801617356898937,
+      "qa_f1_score_stderr,none": "N/A"
+    }
+  }
+}
